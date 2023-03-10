@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Youtube Video Downloader</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<style>
+		body {
+			text-align: center;
+		}
+		progress {
+			width: 50%;
+			height: 20px;
+			margin: 20px auto;
+			display: block;
+		}
+	</style>
+	<script>
+		$(document).ready(function() {
+			$('#download-form').submit(function(event) {
+				event.preventDefault();
+				var url = $('#url-input').val();
+				if (!youtube_dl) {
+					alert('Error: youtube_dl not defined');
+					return;
+				}
+				if (!youtube_dl.validateURL(url)) {
+					alert('Error: Invalid Youtube URL');
+					return;
+				}
+				$.post('/download', { url: url })
+					.done(function(data) {
+						$('#download-message').text('Download complete!');
+						$('#download-link').attr('href', data.url);
+						$('#download-link').attr('download', data.filename);
+						$('#download-link')[0].click();
+					})
+					.fail(function(xhr, status, error) {
+						alert('Error: ' + error);
+					});
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1>Youtube Video Downloader</h1>
+	<form id="download-form">
+		<label for="url-input">Enter Youtube Video URL:</label>
+		<input type="text" id="url-input" name="url">
+		<input type="submit" value="Download">
+	</form>
+	<p id="download-message"></p>
+	<progress id="download-progress" value="0"></progress>
+	<a id="download-link" href="#"></a>
+</body>
+</html>
